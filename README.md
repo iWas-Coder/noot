@@ -25,13 +25,18 @@
 
 ### The Tux Edition
 
+<img src="assets/tux.png" alt="Tux" width="12%">
+
 (...)
 
 ### The Freedo Edition
+
+<img src="assets/freedo.png" alt="Freedo" width="12%">
 
 (...)
 
 ### The Hurd Edition
 
-(...)
+<img src="assets/hurd.png" alt="Hurd" width="12%">
 
+(...)
