@@ -1,0 +1,8 @@
+*.hex0 linguist-detectable=true
+*.hex0 linguist-language=asm
+
+*.hex1 linguist-detectable=true
+*.hex1 linguist-language=asm
+
+*.hex2 linguist-detectable=true
+*.hex2 linguist-language=asm
