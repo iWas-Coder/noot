@@ -1,0 +1,119 @@
+#!/bin/sh
+
+SRC_DIR="src"
+CONFIG_FILE="config.json"
+
+[ "$0" != "./scripts/kernel" ] && exit 1
+[ ! -d "$SRC_DIR" ] && exit 1
+[ ! -f "$CONFIG_FILE" ] && exit 1
+
+
+C_RESET='\033[0m'
+CB_BLACK='\033[1;30m'
+CB_RED='\033[1;31m'
+CB_GREEN='\033[1;32m'
+CB_YELLOW='\033[1;33m'
+CB_BLUE='\033[1;34m'
+CB_PURPLE='\033[1;35m'
+CB_CYAN='\033[1;36m'
+CB_WHITE='\033[1;37m'
+
+printc () {
+  COLOR_SEQ="$1"
+  MSG="$2"
+  END_SEQ="$3"
+  if [ -z "$END_SEQ" ] || [ "$END_SEQ" = '\n' ]; then
+    END_SEQ='\n'
+  fi
+  printf "${COLOR_SEQ}${MSG}${C_RESET}${END_SEQ}"
+}
+
+
+FLAVOR=$(jq -r .kernel.flavor "$CONFIG_FILE")
+
+case "$FLAVOR" in
+  linux)
+    printc $CB_PURPLE "[+] Selected flavor" ': '
+    printc $CB_YELLOW "$FLAVOR"
+    BRANCH=$(jq -r .kernel.branch "$CONFIG_FILE")
+    HTML_PARSE_URL="https://kernel.org"
+    HTML_PARSE_STR='<tr align="left">'
+    HTML_PARSE_LINES=3
+    
+    parse_versions () {
+      for i in $(seq $1 $2); do
+        curl -s "$HTML_PARSE_URL"                               \
+          | grep "$HTML_PARSE_STR" -A "$HTML_PARSE_LINES" -m $i \
+          | tail -n "$HTML_PARSE_LINES" >> out.tmp
+      done
+    }
+    
+    case "$BRANCH" in
+      mainline)
+        printc $CB_PURPLE "[+] Selected branch" ': '
+        printc $CB_YELLOW "$BRANCH"
+        HTML_PARSE_VERSION_LINE_NUM_START=1
+        HTML_PARSE_VERSION_LINE_NUM_END=1
+      ;;
+      stable)
+        printc $CB_PURPLE "[+] Selected branch" ': '
+        printc $CB_YELLOW "$BRANCH"
+        HTML_PARSE_VERSION_LINE_NUM_START=2
+        HTML_PARSE_VERSION_LINE_NUM_END=2
+      ;;
+      longterm)
+        printc $CB_PURPLE "[+] Selected branch" ': '
+        printc $CB_YELLOW "$BRANCH"
+        HTML_PARSE_VERSION_LINE_NUM_START=3
+        HTML_PARSE_VERSION_LINE_NUM_END=8
+      ;;
+      *)
+        printc $CB_PURPLE "\nAvailable branches:"
+        printc $CB_YELLOW "  mainline"
+        printc $CB_YELLOW "  stable"
+        printc $CB_YELLOW "  longterm"
+        exit 1
+    esac
+     
+    parse_versions $HTML_PARSE_VERSION_LINE_NUM_START $HTML_PARSE_VERSION_LINE_NUM_END
+
+    selected_name=$(
+      cat out.tmp           \
+        | sed -n '1p'       \
+        | sed 's/<td>//g'   \
+        | sed 's/<\/td>//g' \
+        | tr -d ':'         \
+        | xargs
+    )
+    selected_version=$(
+      cat out.tmp               \
+        | sed -n '2p'           \
+        | sed 's/<td>//g'       \
+        | sed 's/<\/td>//g'     \
+        | sed 's/<strong>//g'   \
+        | sed 's/<\/strong>//g' \
+        | xargs
+    )
+    selected_date=$(
+      cat out.tmp           \
+        | sed -n '3p'       \
+        | sed 's/<td>//g'   \
+        | sed 's/<\/td>//g' \
+        | tr -d '-'         \
+        | xargs
+    )
+    selected_full=${selected_name}-${selected_version}-${selected_date}
+    printc $CB_PURPLE "[+] Selected kernel" ': '
+    printc $CB_YELLOW "$selected_full"
+    rm out.tmp
+    
+    WGET="wget -q --show-progress -c -P $SRC_DIR"
+    selected_version_major=$(awk -F '.' '{print $1}' <<< "$selected_version")
+    $WGET "${HTML_PARSE_URL}/pub/linux/kernel/v${selected_version_major}.x/linux-${selected_version}.tar.xz"
+  ;;
+  *)
+    printc $CB_PURPLE "Available flavors:"
+    printc $CB_YELLOW "  linux"
+    exit 1
+esac
+

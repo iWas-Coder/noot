@@ -73,8 +73,3 @@ procps ???
 e2fsprogs ???
 sysklogd ???
 sysvinit ???
-linux 6.3.8 https://cdn.kernel.org/pub/linux/kernel/v6.x/linux-*.tar.xz
-linux-libre 6.3.8 https://linux-libre.fsfla.org/pub/linux-libre/releases/*-gnu/linux-libre-*-gnu.tar.xz
-hurd 0.9 https://ftp.gnu.org/gnu/hurd/hurd-*.tar.gz
-gnumach 1.8 https://ftp.gnu.org/gnu/gnumach/gnumach-*.tar.gz
-mig 1.8 https://ftp.gnu.org/gnu/mig/mig-*.tar.gz

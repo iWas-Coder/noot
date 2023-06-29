@@ -1,0 +1,57 @@
+#!/bin/sh
+
+SRC_DIR="src"
+SRC_FILE="sources"
+CONFIG_FILE="config.json"
+WGET="wget -q --show-progress -c -P $SRC_DIR"
+
+[ "$0" != "./scripts/get-sources" ] && exit 1
+[ ! -d "$SRC_DIR" ] && exit 1
+
+
+C_RESET='\033[0m'
+CB_BLACK='\033[1;30m'
+CB_RED='\033[1;31m'
+CB_GREEN='\033[1;32m'
+CB_YELLOW='\033[1;33m'
+CB_BLUE='\033[1;34m'
+CB_PURPLE='\033[1;35m'
+CB_CYAN='\033[1;36m'
+CB_WHITE='\033[1;37m'
+
+printc () {
+  COLOR_SEQ="$1"
+  MSG="$2"
+  END_SEQ="$3"
+  if [ -z "$END_SEQ" ] || [ "$END_SEQ" = '\n' ]; then
+    END_SEQ='\n'
+  fi
+  printf "${COLOR_SEQ}${MSG}${C_RESET}${END_SEQ}"
+}
+
+
+selected_pkgs=$(jq .packages "$CONFIG_FILE" | xargs)
+printc $CB_PURPLE "[+] Selected packages" ': '
+printc $CB_YELLOW "$selected_pkgs"
+
+while read line; do
+  NAME=$(echo "$line" | awk '{print $1}')
+  VERSION=$(echo "$line" | awk '{print $2}')
+  URL=$(echo "$line" | awk '{print $3}')
+  
+  if [ ! -z "$URL" ]; then
+    DOWN_URL=$(sed "s/*/$VERSION/" <<< "$URL")
+
+    if [ ! -z "$1" ]; then
+      if [ "$1" = "$NAME" ]; then
+        $WGET "$DOWN_URL"
+        exit 0
+      else
+        continue
+      fi
+    else
+      $WGET "$DOWN_URL"
+    fi
+  fi
+done < "$SRC_FILE"
+

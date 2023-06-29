@@ -1,0 +1,40 @@
+{
+  "packages": [
+    "binutils",
+    "gcc",
+    "mpfr",
+    "gmp",
+    "mpc",
+    "glibc",
+    "m4",
+    "ncurses",
+    "bash",
+    "coreutils",
+    "diffutils",
+    "findutils",
+    "gawk",
+    "grep",
+    "gzip",
+    "make",
+    "patch",
+    "sed",
+    "tar",
+    "gettext",
+    "bison",
+    "texinfo",
+    "readline",
+    "dejagnu",
+    "libtool",
+    "gdbm",
+    "gperf",
+    "inetutils",
+    "autoconf",
+    "automake",
+    "groff",
+    "grub"
+  ],
+  "kernel": {
+    "flavor": "linux",
+    "branch": "stable"
+  }
+}
