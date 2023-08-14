@@ -1,11 +1,11 @@
 #!/bin/sh
 
 SRC_DIR="src"
-SRC_FILE="sources"
+SRC_FILE="./scripts/get-pkgs.src"
 CONFIG_FILE="config.json"
 WGET="wget -q --show-progress -c -P $SRC_DIR"
 
-[ "$0" != "./scripts/get-sources" ] && exit 1
+[ "$0" != "./scripts/get-pkgs" ] && exit 1
 [ ! -d "$SRC_DIR" ] && exit 1
 
 

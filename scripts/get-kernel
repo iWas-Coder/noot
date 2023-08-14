@@ -3,7 +3,7 @@
 SRC_DIR="src"
 CONFIG_FILE="config.json"
 
-[ "$0" != "./scripts/kernel" ] && exit 1
+[ "$0" != "./scripts/get-kernel" ] && exit 1
 [ ! -d "$SRC_DIR" ] && exit 1
 [ ! -f "$CONFIG_FILE" ] && exit 1
 
@@ -102,10 +102,10 @@ case "$FLAVOR" in
         | tr -d '-'         \
         | xargs
     )
+    rm out.tmp
     selected_full=${selected_name}-${selected_version}-${selected_date}
     printc $CB_PURPLE "[+] Selected kernel" ': '
-    printc $CB_YELLOW "$selected_full"
-    rm out.tmp
+    printc $CB_YELLOW "$selected_full" 
     
     WGET="wget -q --show-progress -c -P $SRC_DIR"
     selected_version_major=$(awk -F '.' '{print $1}' <<< "$selected_version")
